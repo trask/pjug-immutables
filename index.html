@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <meta name="keywords" content="remark,remarkjs,markdown,slideshow,presentation"/>
+  <meta name="description" content="A simple, in-browser, markdown-driven slideshow tool."/>
+  <title>Immutables</title>
+  <style type="text/css">
+    @import url(//fonts.googleapis.com/css?family=Droid+Serif);
+    @import url(//fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+    @import url(//fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+    body {
+      font-family: 'Droid Serif';
+    }
+
+    h1, h2, h3 {
+      font-family: 'Yanone Kaffeesatz';
+      font-weight: 400;
+      margin-bottom: 0;
+    }
+
+    .remark-slide-content h1 {
+      font-size: 3em;
+    }
+
+    .remark-slide-content h2 {
+      font-size: 2em;
+    }
+
+    .remark-slide-content h3 {
+      font-size: 1.6em;
+    }
+
+    .footnote {
+      position: absolute;
+      bottom: 3em;
+    }
+
+    li p {
+      line-height: 1.25em;
+    }
+
+    .red {
+      color: #fa0000;
+    }
+
+    .large {
+      font-size: 2em;
+    }
+
+    a, a > code {
+      color: black;
+      text-decoration: none;
+    }
+
+    code {
+      -moz-border-radius: 5px;
+      -web-border-radius: 5px;
+      background: #e7e8e2;
+      border-radius: 5px;
+    }
+
+    .remark-code, .remark-inline-code {
+      font-family: 'Ubuntu Mono';
+    }
+
+    .remark-code-line-highlighted {
+      background-color: #373832;
+    }
+
+    .pull-left {
+      float: left;
+      width: 47%;
+    }
+
+    .pull-right {
+      float: right;
+      width: 47%;
+    }
+
+    .pull-right ~ p {
+      clear: both;
+    }
+
+    #slideshow .slide .content code {
+      font-size: 0.8em;
+    }
+
+    #slideshow .slide .content pre code {
+      font-size: 0.9em;
+      padding: 15px;
+    }
+
+    .inverse {
+      background: #272822;
+      color: #777872;
+      text-shadow: 0 0 20px #333;
+    }
+
+    .inverse h1, .inverse h2 {
+      color: #f3f3f3;
+      line-height: 0.8em;
+    }
+
+    /* Slide-specific styling */
+    #slide-inverse .footnote {
+      bottom: 12px;
+      left: 20px;
+    }
+
+    #slide-how .slides {
+      font-size: 0.9em;
+      position: absolute;
+      top: 151px;
+      right: 140px;
+    }
+
+    #slide-how .slides h3 {
+      margin-top: 0.2em;
+    }
+
+    #slide-how .slides .first, #slide-how .slides .second {
+      padding: 1px 20px;
+      height: 90px;
+      width: 120px;
+      -moz-box-shadow: 0 0 10px #777;
+      -webkit-box-shadow: 0 0 10px #777;
+      box-shadow: 0 0 10px #777;
+    }
+
+    #slide-how .slides .first {
+      background: #fff;
+      position: absolute;
+      top: 20%;
+      left: 20%;
+      z-index: 1;
+    }
+
+    #slide-how .slides .second {
+      position: relative;
+      background: #fff;
+      z-index: 0;
+    }
+
+    /* Two-column layout */
+    .left-column {
+      color: #777;
+      width: 18%;
+      height: 92%;
+      float: left;
+    }
+
+    .left-column h2:last-of-type, .left-column h3:last-child {
+      color: #000;
+    }
+
+    .right-column {
+      width: 79%;
+      float: right;
+      padding-top: 1em;
+    }
+
+    .vcenter h1, .vcenter h2 {
+      margin-top: 0;
+    }
+
+    /* more horizontal realestate */
+    .remark-slide-content {
+      padding-left: 2em;
+      padding-right: 2em;
+    }
+
+    .right-column-incremental {
+      width: 80%;
+      float: right;
+    }
+
+    .section-top-padding {
+      padding-top: 30px;
+    }
+
+	.super-mini .remark-code {
+	  font-size: 7px;
+	  padding-left: 10px;
+	}
+	
+	.example-usage {
+	  margin-top: -20px;
+	}
+	
+	.example-code code {
+	  background: #666 !important;
+	}
+
+	.example-code .remark-code-line-highlighted {
+	  background: #888;
+	}
+  </style>
+</head>
+<body>
+<textarea id="source">
+class: center, middle
+.vcenter[
+# Lose the boilerplate,
+# Keep the Java
+]
+
+
+
+---
+.left-column[
+## Java's boilerplate problem
+]
+.right-column[.super-mini[
+```
+public class Alien {
+
+    private final String name;
+    private final String homePlanet;
+    private final List<String> episodes;
+
+    private Alien(String name, String homePlanet, List<String> episodes) {
+        this.name = name;
+        this.homePlanet = homePlanet;
+        this.episodes = ImmutableList.copyOf(episodes);
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public String homePlanet() {
+        return homePlanet;
+    }
+
+    public List<String> episodes() {
+        return episodes;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, homePlanet, episodes);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj instanceof Alien) {
+            Alien that = (Alien) obj;
+            return Objects.equals(name, that.name)
+                    && Objects.equals(homePlanet, that.homePlanet)
+                    && Objects.equals(episodes, that.episodes);
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(Alien.class)
+                .add("name", name)
+                .add("homePlanet", homePlanet)
+                .add("episodes", episodes)
+                .toString();
+    }
+
+    public static class Builder {
+        
+        private String name;
+        private String homePlanet;
+        private List<String> episodes;
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder homePlanet(String homePlanet) {
+            this.homePlanet = homePlanet;
+            return this;
+        }
+
+        public Builder episodes(List<String> episodes) {
+            this.episodes = episodes;
+            return this;
+        }
+        
+        public Alien build() {
+            return new Alien(name, homePlanet, episodes);
+        }
+    }
+}
+```
+]]
+
+
+
+---
+.left-column[
+## Option 1: Project Lombok
+]
+.right-column[
+```
+@Value
+@Builder
+public class Alien {
+
+    private final String name;
+    private final String homePlanet;
+    private final List<String> episodes;
+}
+```
+]
+--
+.right-column[.example-usage[
+Usage:
+.example-code[
+```
+Alien alien = Alien.builder()
+        .name("Raxacoricofallapatorians")
+        .homePlanet("Raxacoricofallapatorius")
+        .episodes(ImmutableList.of("Aliens of London",
+                                   "World War Three",
+                                   "Boom Town"))
+        .build();
+```
+]]]
+
+
+---
+.left-column[
+## Option 2: Scala
+]
+.right-column[
+```
+case class Alien(name: String,
+                 homePlanet: String,
+                 episodes: Iterable[String])
+```
+]
+--
+.right-column[.example-usage[
+Usage:
+.example-code[
+```
+Alien alien = Alien(
+        name = "Weeping Angels",
+        homePlanet = "Unknown",
+        episodes = List("Blink",
+                        "The Time of Angels",
+                        "Flesh and Stone"))
+```
+]]]
+
+
+
+---
+.left-column[
+## Option 3: AutoValue
+]
+.right-column[
+```
+@AutoValue
+public abstract class Alien {
+
+    public abstract String name();
+    public abstract String homePlanet();
+    public abstract List<String> episodes();
+
+    @AutoValue.Builder
+    interface Builder {
+        Builder name(String name);
+        Builder homePlanet(String homePlanet);
+        Builder episodes(List<String> episodes);
+        Alien build();
+    }
+}
+```
+]
+--
+.right-column[.example-usage[
+Usage:
+.example-code[
+```
+Alien alien = new AutoValue_Alien.Builder()
+        .name("Cybermen")
+        .homePlanet("Mondas")
+        .episodes(ImmutableList.of("Rise of the Cybermen",
+                                   "The Age of Steel",
+                                   "Army of Ghosts"))
+        .build();
+```
+]]]
+
+
+
+---
+.left-column[
+## Option 4: Immutables
+]
+.right-column[
+```
+@Value.Immutable
+public abstract class Alien {
+
+    public abstract String name();
+    public abstract String homePlanet();
+    public abstract List<String> episodes();
+}
+```
+]
+--
+.right-column[.example-usage[
+Usage:
+.example-code[
+```
+Alien alien = ImmutableAlien.builder()
+        .name("Daleks")
+        .homePlanet("Skaro")
+        .addEpisodes("Bad Wolf",
+                     "The Parting of the Ways",
+                     "Daleks in Manhattan")
+        .build();
+```
+]]]
+
+
+
+---
+class: center, middle
+.vcenter[
+# I &#x2764; Immutables
+]
+
+
+
+---
+.left-column[
+## Optional attributes
+]
+.right-column[
+```
+@Value.Immutable
+public abstract class Alien {
+
+    public abstract String name();
+*   public abstract Optional<String> homePlanet();
+    public abstract List<String> episodes();
+}
+```
+]
+--
+.right-column[.example-usage[
+Usage:
+.example-code[
+```
+Alien alien = ImmutableAlien.builder()
+        .name("Toclafane")
+        .addEpisodes("The Sound of Drums",
+                     "Last of the Time Lords")
+        .build();
+        
+```
+]]]
+
+
+
+---
+.left-column[
+## Default attributes
+]
+.right-column[
+```
+@Value.Immutable
+public abstract class Alien {
+
+    public abstract String name();
+    
+*   @Value.Default
+*   public String homePlanet() {
+*       return "Unknown";
+*   }
+    
+    public abstract List<String> episodes();
+}
+```
+]
+--
+.right-column[.example-usage[
+Usage:
+.example-code[
+```
+Alien alien = ImmutableAlien.builder()
+        .name("Judoon")
+        .addEpisodes("Smith and Jones",
+                     "The Stolen Earth")
+        .build();
+        
+```
+]]]
+
+
+
+---
+.left-column[
+## Nullable attributes
+]
+.right-column[
+```
+@Value.Immutable
+public abstract class Alien {
+
+    public abstract String name();
+    
+*   public abstract @Nullable String homePlanet();
+    
+    public abstract List<String> episodes();
+}
+```
+]
+--
+.right-column[.example-usage[
+Usage:
+.example-code[
+```
+Alien alien = ImmutableAlien.builder()
+        .name("Clockwork Droids")
+        .addEpisodes("The Girl in the Fireplace",
+                     "Deep Breath")
+        .build();
+        
+```
+]]]
+
+
+
+---
+.left-column[
+## Precondition check method
+]
+.right-column[
+```
+@Value.Immutable
+public abstract class Alien {
+
+    public abstract String name();
+    public abstract String homePlanet();
+    public abstract List<String> episodes();
+    
+    @Value.Check
+    void check() {
+        Preconditions.checkState(!episodes().isEmpty());
+    }
+}
+```
+]
+--
+.right-column[.example-usage[
+Usage:
+.example-code[
+```
+// build() will throw IllegalStateException
+
+Alien alien = ImmutableAlien.builder()
+        .name("Catkind")
+        .homePlanet("New Earth")
+        .build();
+```
+]]]
+
+
+
+---
+.left-column[
+## Collection attributes
+]
+.right-column[
+
+Builders are sprinkled with sugar for:
+
+* java.util.List<T>
+
+* java.util.Set<T>
+
+* java.util.Map<K, V>
+
+* com.google.common.collect.Multiset<T>
+
+* com.google.common.collect.Multimap<K, V>
+
+  * ListMultimap
+
+  * SetMultimap
+]
+
+
+
+---
+.left-column[
+## Constructor methods
+]
+.right-column[
+```
+@Value.Immutable
+public abstract class Alien {
+
+*   @Value.Parameter
+    public abstract String name();
+    
+*   @Value.Parameter
+    public abstract String homePlanet();
+}
+```
+]
+--
+.right-column[.example-usage[
+Usage:
+.example-code[
+```
+ImmutableAlien.of("Abzorbaloff", "Clom")
+```
+]]]
+
+
+
+---
+.left-column[
+## JSON
+]
+.right-column[
+```
+@Value.Immutable
+*@JsonSerialize(as = ImmutableAlien.class)
+*@JsonDeserialize(as = ImmutableAlien.class)
+public abstract class Alien {
+
+    public abstract String name();
+    @JsonProperty("homeWorld")
+    public abstract String homePlanet();
+    public abstract List<String> episodes();
+}
+```
+]
+--
+.right-column[.example-usage[
+Usage:
+.example-code[
+```
+String content = "{...}";
+Alien alien = new ObjectMapper().readValue(content, Alien.class);
+```
+]]]
+
+
+
+---
+.left-column[
+## Flexible styles
+]
+.right-column[
+```
+@Value.Style(typeAbstract = "*Base", typeImmutable = "")
+```
+]
+--
+.right-column[
+```
+@Value.Immutable
+public abstract class AlienBase {
+
+    public abstract String name();
+    public abstract String homePlanet();
+    public abstract List<String> episodes();
+}
+```
+]
+--
+.right-column[.example-usage[
+Usage:
+.example-code[
+```
+Alien alien = Alien.builder()
+        .name("Ood")
+        .homePlanet("Ood Sphere")
+        .addEpisodes("The Impossible Planet",
+                     "The Satan Pit",
+                     "Planet of the Ood")
+        .build();
+```
+]]]
+
+
+
+---
+.left-column[
+## Many more features
+]
+.right-column[
+
+* Derived Attributes
+* Lazy Attributes
+* Copy methods (a.k.a. withers)
+* Singleton "empty" instances
+* Instance interning
+* Precomputed hashCode
+* Customize toString, hashCode and equals
+* Immutable Annotation
+* Auxiliary attributes
+* Serialization
+* Factory builders
+
+<br>
+See http://immutables.github.io
+]
+
+
+
+</textarea>
+<script src="//gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+  var hljs = remark.highlighter.engine;
+</script>
+<script src="//gnab.github.io/remark/remark.language.js" type="text/javascript"></script>
+<script type="text/javascript">
+  var slideshow = remark.create({
+      highlightStyle: 'sunburst',
+      highlightLanguage: 'java'
+    }) ;
+</script>
+</body>
+</html>
